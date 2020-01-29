@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="mmk.study.launcher">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+
+
+    <uses-feature android:name="android.hardware.camera.flash" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".activities.ContactsActivity"></activity>
+        <activity
+            android:name=".Main2Activity"
+            android:launchMode="singleTask"
+            android:stateNotNeeded="true">
+
+            <!--
+            android:launchMode -> (singleTask) Can only start one task.
+            android:stateNotNeeded -> Can be initialized without reference to previous state.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <!--
+                Indicates that when you press home button,
+                your app will be listed as an option to launch the launcher home or your home activity.
+                -->
+                <category android:name="android.intent.category.HOME" />
+                <!-- Indicates that this app can receive implicits intents of others apps. -->
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.SettingsActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/AppTheme"></activity>
+    </application>
+
+</manifest>

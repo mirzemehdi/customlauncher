@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Cava Launcher</string>
+    <string name="readingContactsPermissionDenied">Kontaktları oxumaq mümkün olmadı</string>
+</resources>
