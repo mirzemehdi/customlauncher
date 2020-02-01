@@ -28,7 +28,7 @@ import mmk.study.launcher.activities.ContactsActivity;
 public class Main2Activity extends AppCompatActivity  {
 
     private TextView dateTxt,timeTxt;
-    private LinearLayout callLayout,messageLayout,cameraLayout,galleryLayout,flashLayout,whatsappLayout;
+    private LinearLayout callLayout,messageLayout,cameraLayout,galleryLayout,flashLayout,whatsappLayout,contactsLayout;
     private ImageView flashLightImage;
     private boolean isFlashOn=false;
     private CameraManager mCameraManager;
@@ -39,7 +39,7 @@ public class Main2Activity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        startActivity(new Intent(this, ContactsActivity.class));
+
         initView();
         setClicks();
         setupFlashLight();
@@ -158,6 +158,14 @@ public class Main2Activity extends AppCompatActivity  {
                 startActivity(intent);
             }
         });
+
+        contactsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(Main2Activity.this,ContactsActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void noFlashErrorMessage() {
@@ -208,6 +216,7 @@ public class Main2Activity extends AppCompatActivity  {
         galleryLayout=findViewById(R.id.item4);
         whatsappLayout=findViewById(R.id.item5);
         flashLayout=findViewById(R.id.item6);
+        contactsLayout=findViewById(R.id.item7);
         flashLightImage=findViewById(R.id.torchImageView);
         flashLightImage.setBackgroundResource(R.drawable.torch_off);
     }

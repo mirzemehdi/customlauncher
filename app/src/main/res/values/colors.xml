@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#171818</color>
     <color name="colorAccent">#D81B60</color>
     <color name="bgColor">#1B1919</color>
+    <color name="colorAddBtnActive">#19551B</color>
+    <color name="colorAddBtnPassive">#4CAF50</color>
+
+    <color name="colorCancelBtnActive">#A81E15</color>
+    <color name="colorCancelBtnPassive">#F44336</color>
 </resources>

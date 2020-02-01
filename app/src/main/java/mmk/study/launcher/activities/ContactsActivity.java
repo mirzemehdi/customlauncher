@@ -1,6 +1,7 @@
 package mmk.study.launcher.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Observer;
@@ -16,15 +17,25 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import mmk.study.launcher.Common.Common;
 import mmk.study.launcher.R;
 import mmk.study.launcher.adapters.ContactsAdapter;
 import mmk.study.launcher.contentProviders.ContactsProvider;
+import mmk.study.launcher.interfaces.ContactItemClicked;
 import mmk.study.launcher.objects.ContactObject;
 import mmk.study.launcher.repository.ContactsRepository;
 import mmk.study.launcher.viewmodel.ContactsViewModel;
@@ -35,6 +46,8 @@ public class ContactsActivity extends AppCompatActivity {
     private RecyclerView contactsRecylerView;
     private ContactsAdapter contactsAdapter;
     private List<ContactObject> contactObjectList=new ArrayList<>();
+    private FloatingActionButton addContactButton;
+    private AlertDialog addContactDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +60,14 @@ public class ContactsActivity extends AppCompatActivity {
 
         init();
         getAllContactsByString("");
+        addContactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String dialogAddBtnTxt=getResources().getString(R.string.dialogAddBtnTxt);
+                createAlertDialog(dialogAddBtnTxt,Common.TYPE_INSERT,null,null,null);
+
+            }
+        });
 
         List<String> numbers=new  ArrayList<>();
         numbers.add("0554765655");
@@ -63,22 +84,102 @@ public class ContactsActivity extends AppCompatActivity {
         contactsRecylerView=findViewById(R.id.contactsRecylerView);
         contactsRecylerView.setHasFixedSize(true);
         contactsRecylerView.setLayoutManager(new LinearLayoutManager(this));
-        contactsAdapter=new ContactsAdapter(this);
+        contactsAdapter=new ContactsAdapter(this, new ContactItemClicked() {
+            @Override
+            public void onClick(ContactObject contact) {
+                editContact(contact);
+            }
+        });
         contactsRecylerView.setAdapter(contactsAdapter);
+        addContactButton=findViewById(R.id.addContactFAB);
 
 
     }
 
-    private void updateContact(ContactObject contactObject) {
-        if (!getPermissions())
-            return ;
-        contactsViewModel.updateContact(contactObject);
+    private void editContact(ContactObject contact) {
+        String dialogBtnTxt=getResources().getString(R.string.dialogUpdateBtnTxt);
+
+        createAlertDialog(dialogBtnTxt,Common.TYPE_UPDATE,contact.getId()
+                ,contact.getDisplayName(),contact.getPhoneNumbers().get(0));
     }
 
-    private void insertContact(ContactObject contactObject) {
-        if (!getPermissions())
-            return ;
-        contactsViewModel.insertContact(contactObject);
+
+    private void createAlertDialog(String positiveBtnTxt,String type,String contactId,String displayName,String phone){
+
+        AlertDialog.Builder builder=new AlertDialog.Builder(ContactsActivity.this);
+        final View view=getLayoutInflater().inflate(R.layout.contact_dialog_view,null);
+
+        TextView titleTextView=view.findViewById(R.id.contact_dialog_title_tv);
+        if (type.equals(Common.TYPE_INSERT)) titleTextView.setText(getResources().getString(R.string.dialogTitleInsert));
+        else if (type.equals(Common.TYPE_UPDATE)) titleTextView.setText(getResources().getString(R.string.dialogTitleUpdate));
+
+        Button cancelBtn=view.findViewById(R.id.contact_dialog_cancel_btn);
+        Button addBtn=view.findViewById(R.id.contact_dialog_add_btn);
+        addBtn.setText(positiveBtnTxt);
+        final EditText nameEditText=view.findViewById(R.id.contact_dialog_name_editText);
+        final EditText phoneEditText=view.findViewById(R.id.contact_dialog_phone_editText);
+        if (displayName!=null) nameEditText.setText(displayName);
+        if (phone!=null) phoneEditText.setText(phone);
+
+        addBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (type.equals(Common.TYPE_INSERT))
+                    insertContact(nameEditText.getText().toString(),phoneEditText.getText().toString(),view);
+                else if (type.equals(Common.TYPE_UPDATE))
+                    updateContact(contactId,nameEditText.getText().toString(),phoneEditText.getText().toString(),view);
+            }
+        });
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addContactDialog.dismiss();
+            }
+        });
+
+        builder.setView(view);
+        addContactDialog=builder.create();
+        addContactDialog.setCancelable(false);
+        addContactDialog.show();
+
+    }
+
+    private void updateContact(String id,String name,String phone,View dialogView) {
+
+        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(phone)){
+
+            if (!getPermissions())
+                return ;
+            List<String> numbers=new ArrayList<>();
+            numbers.add(phone);
+            ContactObject contactObject=new ContactObject(id,name,numbers);
+            contactsViewModel.updateContact(contactObject);
+            Toast.makeText(this, getResources().getString(R.string.updateContactSuccess), Toast.LENGTH_SHORT).show();
+            addContactDialog.dismiss();
+
+        }
+        else
+            Snackbar.make(dialogView,getResources().getString(R.string.allFieldsNeed),Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void insertContact(String name,String phone,View dialogView) {
+
+        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(phone)){
+
+            if (!getPermissions())
+                return ;
+            List<String> numbers=new ArrayList<>();
+            numbers.add(phone);
+            ContactObject contactObject=new ContactObject(name,numbers);
+            contactsViewModel.insertContact(contactObject);
+            Toast.makeText(this, getResources().getString(R.string.addContactSuccess), Toast.LENGTH_SHORT).show();
+            addContactDialog.dismiss();
+
+        }
+        else
+            Snackbar.make(dialogView,getResources().getString(R.string.allFieldsNeed),Snackbar.LENGTH_SHORT).show();
+
+
     }
 
     private void deleteContact(String id) {
@@ -99,6 +200,8 @@ public class ContactsActivity extends AppCompatActivity {
             public void onChanged(List<ContactObject> contactObjects) {
                 contactsAdapter.setContactObjectList(contactObjects);
                 contactObjectList=contactObjects;
+                Log.d("onChangeContacts","GetAllContacts Activity Called");
+                Log.d("MyContacts: ","onChanged");
                 for (ContactObject contactObject: contactObjects){
                     Log.d("MyContact: ",contactObject.toString());
                 }

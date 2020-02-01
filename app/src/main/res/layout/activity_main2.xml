@@ -60,7 +60,7 @@
             android:alignmentMode="alignMargins"
             android:background="@color/colorPrimaryDark"
             android:columnCount="2"
-            android:rowCount="3">
+            android:rowCount="4">
 
             <LinearLayout
                 android:id="@+id/item1"
@@ -165,6 +165,7 @@
                 </ImageView>
 
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/item6"
                 android:layout_width="0dp"
@@ -179,7 +180,51 @@
 
                 <ImageView
                     android:id="@+id/torchImageView"
+                    android:scaleType="centerCrop"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                </ImageView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/item7"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_rowWeight="1"
+                android:padding="8dp"
+                android:background="@drawable/main_items_bg"
+                android:layout_columnWeight="1"
+                >
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:src="@drawable/ic_contacts"
+                    android:layout_height="match_parent">
+
+                </ImageView>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/item8"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_rowWeight="1"
+                android:padding="8dp"
+                android:background="@drawable/main_items_bg"
+                android:layout_columnWeight="1"
+                >
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:src="@drawable/ic_apps"
                     android:layout_height="match_parent">
 
                 </ImageView>

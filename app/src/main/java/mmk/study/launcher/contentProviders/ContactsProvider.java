@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -30,18 +31,49 @@ import java.util.List;
 
 import mmk.study.launcher.objects.ContactObject;
 
-public class ContactsProvider {
+public class ContactsProvider extends MutableLiveData {
 
     private ContentResolver cr;
+    private ContentObserver contentObserver;
+    private MutableLiveData<List<ContactObject>> mutableContactList;
+
+//    @Override
+//    protected void onActive() {
+//        super.onActive();
+//        contentObserver=new ContentObserver(null) {
+//            @Override
+//            public void onChange(boolean selfChange) {
+//                super.onChange(selfChange);
+//
+//            }
+//        };
+//
+//    }
+
+    @Override
+    protected void onInactive() {
+        super.onInactive();
+        cr.unregisterContentObserver(contentObserver);
+    }
 
     public ContactsProvider(Application context) {
         this.cr = context.getContentResolver();
+        mutableContactList=new MutableLiveData<>();
+        contentObserver=new ContentObserver(null) {
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                Log.d("onChangeContacts","Called");
+                getContactsByString("");
+            }
+        };
+        cr.registerContentObserver(ContactsContract.Contacts.CONTENT_URI,true,contentObserver);
         Contacts.initialize(context);
     }
 
     public LiveData<List<ContactObject>> getAllContacts() {
 
-        MutableLiveData<List<ContactObject>> mutableContactList = new MutableLiveData<>();
+
         List<ContactObject> contactObjectList = new ArrayList<>();
         List<Contact>contacts= Contacts.getQuery().hasPhoneNumber().find();
 
@@ -55,8 +87,8 @@ public class ContactsProvider {
             }
             contactObjectList.add(contactObject);
         }
-
-        mutableContactList.setValue(contactObjectList);
+        mutableContactList.postValue(contactObjectList);
+//        mutableContactList.setValue(contactObjectList);
 
 
         return mutableContactList;
@@ -65,13 +97,13 @@ public class ContactsProvider {
     public LiveData<List<ContactObject>> getContactsByString(String searchString) {
 
 
-        MutableLiveData<List<ContactObject>> mutableContactList = new MutableLiveData<>();
+
         List<ContactObject> contactObjectList = new ArrayList<>();
 
-        Query mainQuery = Contacts.getQuery().hasPhoneNumber();
-        Query q1 = Contacts.getQuery().hasPhoneNumber();
+        Query mainQuery = Contacts.getQuery();
+        Query q1 = Contacts.getQuery();
         q1.whereStartsWith(Contact.Field.DisplayName, searchString);
-        Query q2 = Contacts.getQuery().hasPhoneNumber();
+        Query q2 = Contacts.getQuery();
         q2.whereStartsWith(Contact.Field.PhoneNormalizedNumber, searchString);
         List<Query> qs = new ArrayList<>();
         qs.add(q1);
@@ -89,8 +121,8 @@ public class ContactsProvider {
             }
             contactObjectList.add(contactObject);
         }
-
-        mutableContactList.setValue(contactObjectList);
+        Log.d("onChangeContacts","GetAllContacts Called");
+        mutableContactList.postValue(contactObjectList);
 
 
         return mutableContactList;
@@ -142,6 +174,8 @@ public class ContactsProvider {
 //        contactList.setValue(contactObjectList);
 //        return contactList;
     }
+
+
 
     public void deleteContact(String id) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();

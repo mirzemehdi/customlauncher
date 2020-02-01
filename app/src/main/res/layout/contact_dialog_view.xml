@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#fff"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/contact_dialog_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:fontFamily="@font/montserrat"
+        android:text="Yeni kontakt?"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="32sp"
+        android:textStyle="bold">
+
+    </TextView>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/contact_dialog_name_textLayout"
+
+        android:theme="@style/TextInputLayoutCustom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contact_dialog_title_tv"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="5dp"
+
+        android:hint="@string/displayNameHint"
+        android:textColorHint="#fff"
+        app:boxBackgroundColor="@color/colorPrimaryDark"
+        app:boxStrokeColor="#000"
+
+        app:boxBackgroundMode="outline">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/contact_dialog_name_editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColorHint="#fff"
+            android:textCursorDrawable="@null"
+
+            android:fontFamily="@font/montserrat"
+            android:inputType="textPersonName"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/contact_dialog_phone_textLayout"
+        android:theme="@style/TextInputLayoutCustom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contact_dialog_name_textLayout"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="5dp"
+        android:hint="@string/phoneNumberHint"
+        android:textColorHint="#fff"
+        app:boxBackgroundColor="@color/colorPrimaryDark"
+        app:boxStrokeColor="#000"
+        app:boxBackgroundMode="outline">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/contact_dialog_phone_editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textCursorDrawable="@null"
+            android:fontFamily="@font/montserrat"
+            android:inputType="numberDecimal"
+            android:textColor="#fff"
+            android:textSize="24sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contact_dialog_phone_textLayout"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/contact_dialog_cancel_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+
+            android:background="@drawable/cancel_btn_bg"
+            android:fontFamily="@font/montserrat"
+            android:minHeight="20dp"
+            android:padding="10dp"
+
+            android:textAllCaps="false"
+            android:textColor="#fff"
+            android:textSize="24sp"
+            android:text="@string/cancelBtnTxt"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/contact_dialog_add_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/add_contact_btn_bg"
+            android:fontFamily="@font/montserrat"
+            android:minHeight="20dp"
+            android:padding="10dp"
+            android:text="@string/addContactBtnTxt"
+            android:textAllCaps="false"
+            android:textColor="#fff"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</RelativeLayout>

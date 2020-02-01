@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">Cava Launcher</string>
     <string name="readingContactsPermissionDenied">Kontaktları oxumaq mümkün olmadı</string>
+    <string name="displayNameHint">Ad</string>
+    <string name="phoneNumberHint">Nömrə</string>
+    <string name="addContactBtnTxt">Əlavə et</string>
+    <string name="cancelBtnTxt">Ləğv et</string>
+    <string name="allFieldsNeed">Sahələr boş ola bilməz</string>
+    <string name="addContactSuccess">Kontakt əlavə olundu</string>
+    <string name="updateContactSuccess">Kontakt dəyişdirildi</string>
+    <string name="dialogUpdateBtnTxt">Yenilə</string>
+    <string name="dialogAddBtnTxt">Əlavə et</string>
+    <string name="dialogTitleInsert">Yeni kontakt?</string>
+    <string name="dialogTitleUpdate">Kontakt yenilə</string>
 </resources>

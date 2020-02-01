@@ -1,6 +1,7 @@
 package mmk.study.launcher.repository;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -23,6 +24,7 @@ public class ContactsRepository {
     }
 
     public LiveData<List<ContactObject>> getContactsByString(String searchString){
+        Log.d("onChangeContacts","GetAllContacts Repo Called");
         return contactsProvider.getContactsByString(searchString);
     }
 

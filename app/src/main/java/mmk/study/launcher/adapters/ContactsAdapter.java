@@ -14,15 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mmk.study.launcher.R;
+import mmk.study.launcher.interfaces.ContactItemClicked;
 import mmk.study.launcher.objects.ContactObject;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolder> {
 
     private Context context;
     private List<ContactObject> contactObjectList=new ArrayList<>();
+    private ContactItemClicked IContactItemClicked;
 
-    public ContactsAdapter(Context context) {
+    public ContactsAdapter(Context context,ContactItemClicked contactItemClicked) {
         this.context = context;
+        this.IContactItemClicked=contactItemClicked;
 
     }
 
@@ -58,6 +61,11 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
             super(itemView);
             contactName=itemView.findViewById(R.id.contactNameTxtView);
             contactView=itemView.findViewById(R.id.contactView);
+            contactView.setOnClickListener(v -> {
+                ContactObject contactObject=contactObjectList.get(getAdapterPosition());
+                IContactItemClicked.onClick(contactObject);
+           });
         }
+
     }
 }
