@@ -12,4 +12,9 @@
     <string name="dialogAddBtnTxt">Əlavə et</string>
     <string name="dialogTitleInsert">Yeni kontakt?</string>
     <string name="dialogTitleUpdate">Kontakt yenilə</string>
+    <string name="dialogTitleDelete">Kontaktı sil</string>
+    <string name="dialogDeleteMsgPart1">Siz  </string>
+    <string name="dialogDeleteMsgPart2"> adlı kontaktı silmək istədiyinizə əminsiniz?</string>
+    <string name="dialogDeleteBtnTxt">Sil</string>
+    <string name="dialogCancelBtnTxt">Ləğv et</string>
 </resources>

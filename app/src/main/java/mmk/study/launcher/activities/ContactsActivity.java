@@ -7,13 +7,18 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -31,6 +36,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 import mmk.study.launcher.Common.Common;
 import mmk.study.launcher.R;
 import mmk.study.launcher.adapters.ContactsAdapter;
@@ -41,13 +47,15 @@ import mmk.study.launcher.repository.ContactsRepository;
 import mmk.study.launcher.viewmodel.ContactsViewModel;
 
 public class ContactsActivity extends AppCompatActivity {
-    public static final int PERMISSIONS_REQUEST_READ_CONTACTS=1;
+    public static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    public static final int CALL_REQUEST_CODE=2;
     private ContactsViewModel contactsViewModel;
     private RecyclerView contactsRecylerView;
     private ContactsAdapter contactsAdapter;
-    private List<ContactObject> contactObjectList=new ArrayList<>();
+    private List<ContactObject> contactObjectList = new ArrayList<>();
     private FloatingActionButton addContactButton;
     private AlertDialog addContactDialog;
+    private String selectedPhoneNumber="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,22 +64,22 @@ public class ContactsActivity extends AppCompatActivity {
 
 
         getPermissions();
-        contactsViewModel= ViewModelProviders.of(this).get(ContactsViewModel.class);
+        contactsViewModel = ViewModelProviders.of(this).get(ContactsViewModel.class);
 
         init();
         getAllContactsByString("");
         addContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String dialogAddBtnTxt=getResources().getString(R.string.dialogAddBtnTxt);
-                createAlertDialog(dialogAddBtnTxt,Common.TYPE_INSERT,null,null,null);
+                String dialogAddBtnTxt = getResources().getString(R.string.dialogAddBtnTxt);
+                createAlertDialog(dialogAddBtnTxt, Common.TYPE_INSERT, null, null, null);
 
             }
         });
 
-        List<String> numbers=new  ArrayList<>();
+        List<String> numbers = new ArrayList<>();
         numbers.add("0554765655");
-        ContactObject contactObject=new ContactObject("1712","Coyhuuun(Sintezator)",numbers);
+        ContactObject contactObject = new ContactObject("1712", "Coyhuuun(Sintezator)", numbers);
 //        insertContact(contactObject);
 //        updateContact(contactObject );
         //deleteContact("1712");
@@ -81,19 +89,70 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     private void init() {
-        contactsRecylerView=findViewById(R.id.contactsRecylerView);
+        contactsRecylerView = findViewById(R.id.contactsRecylerView);
         contactsRecylerView.setHasFixedSize(true);
         contactsRecylerView.setLayoutManager(new LinearLayoutManager(this));
-        contactsAdapter=new ContactsAdapter(this, new ContactItemClicked() {
+        contactsAdapter = new ContactsAdapter(this, new ContactItemClicked() {
             @Override
             public void onClick(ContactObject contact) {
                 editContact(contact);
             }
         });
         contactsRecylerView.setAdapter(contactsAdapter);
-        addContactButton=findViewById(R.id.addContactFAB);
+        addSwipeFunctionToRecyclerView(contactsRecylerView);
+        addContactButton = findViewById(R.id.addContactFAB);
 
 
+    }
+
+    private void addSwipeFunctionToRecyclerView(RecyclerView contactsRecylerView) {
+
+
+        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                if (direction == ItemTouchHelper.LEFT) {
+                    ContactObject contactObject = contactObjectList.get(viewHolder.getAdapterPosition());
+                    deleteContact(contactObject, viewHolder.getAdapterPosition());
+                } else if (direction == ItemTouchHelper.RIGHT) {
+                    ContactObject contactObject = contactObjectList.get(viewHolder.getAdapterPosition());
+                    callContact(contactObject.getPhoneNumbers().get(0));
+                    contactsAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                }
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                        .addSwipeRightBackgroundColor(getResources().getColor(android.R.color.holo_green_light, null))
+                        .addSwipeRightActionIcon(R.drawable.ic_call_black)
+                        .addSwipeLeftBackgroundColor(getResources().getColor(android.R.color.holo_red_light, null))
+                        .addSwipeLeftActionIcon(R.drawable.ic_delete_white)
+                        .create().decorate();
+
+            }
+        };
+
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(contactsRecylerView);
+    }
+
+    private void callContact(String phoneNumber) {
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+        selectedPhoneNumber=phoneNumber;
+        if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CALL_PHONE},CALL_REQUEST_CODE);
+            return;
+        }
+        startActivity(intent);
     }
 
     private void editContact(ContactObject contact) {
@@ -182,10 +241,27 @@ public class ContactsActivity extends AppCompatActivity {
 
     }
 
-    private void deleteContact(String id) {
+    private void deleteContact(ContactObject contactObject,int position) {
         if (!getPermissions())
             return ;
-        contactsViewModel.deleteContact(id);
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.dialogTitleDelete));
+        String message=getResources().getString(R.string.dialogDeleteMsgPart1)+" "+contactObject.getDisplayName()
+                +" " +getResources().getString(R.string.dialogDeleteMsgPart2);
+        builder.setMessage(message);
+
+        builder.setPositiveButton(getResources().getString(R.string.dialogDeleteBtnTxt), (dialog, which) -> {
+            contactsViewModel.deleteContact(contactObject.getId());
+            contactsAdapter.notifyItemChanged(position);
+
+        });
+        builder.setNegativeButton(getResources().getString(R.string.dialogCancelBtnTxt), (dialog, which) -> {
+            addContactDialog.dismiss();
+            contactsAdapter.notifyItemChanged(position);
+        });
+        addContactDialog=builder.create();
+        addContactDialog.show();
+
 
     }
 
@@ -360,6 +436,13 @@ public class ContactsActivity extends AppCompatActivity {
             if (grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED
                     &&grantResults[1]==PackageManager.PERMISSION_GRANTED){
                 getAllContactsByString("");
+            }
+            else
+                Toast.makeText(this, getResources().getString(R.string.readingContactsPermissionDenied), Toast.LENGTH_SHORT).show();
+        }
+        else if (requestCode==CALL_REQUEST_CODE){
+            if (grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                callContact(selectedPhoneNumber);
             }
             else
                 Toast.makeText(this, getResources().getString(R.string.readingContactsPermissionDenied), Toast.LENGTH_SHORT).show();

@@ -185,10 +185,11 @@ public class ContactsProvider extends MutableLiveData {
                 .withSelection(ContactsContract.RawContacts.CONTACT_ID + "=?", args).build());
         try {
             cr.applyBatch(ContactsContract.AUTHORITY, ops);
-        } catch (RemoteException e) {
+            Log.d("DeleteContactMsg","yeeyty");
+        } catch (RemoteException | OperationApplicationException e) {
             e.printStackTrace();
-        } catch (OperationApplicationException e) {
-            e.printStackTrace();
+            Log.d("DeleteContactMsg","yeey");
+            Log.d("DeleteContactMsg",e.getMessage());
         }
     }
 

@@ -31,7 +31,10 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
+    //design
     implementation 'com.android.support:design:29.0.2'
+    implementation 'it.xabaras.android:recyclerview-swipedecorator:1.2.2'
+
 
     def lifecycle_version = "2.2.0"
 
